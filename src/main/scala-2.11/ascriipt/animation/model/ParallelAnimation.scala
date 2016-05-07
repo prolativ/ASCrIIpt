@@ -2,7 +2,7 @@ package ascriipt.animation.model
 
 import ascriipt.animation.visualisation.Canvas
 
-class ParallelAnimation(subanimations: Seq[Animation]) extends Animation {
+case class ParallelAnimation(subanimations: Seq[Animation]) extends Animation {
     override def draw(atTime: Long, totalDuration: Long)(implicit canvas: Canvas): Unit = {
         subanimations.foreach(_.draw(atTime, totalDuration))
     }

@@ -2,7 +2,7 @@ package ascriipt.animation.model
 
 import ascriipt.animation.visualisation.Canvas
 
-class AsciiImage(chars: Array[Array[Char]], transparent: Char = '\0') extends Animation {
+case class AsciiImage(chars: Array[Array[Char]], transparent: Char = '\0') extends Animation {
     override def draw(atTime: Long, totalDuration: Long)(implicit canvas: Canvas): Unit = {
         for {
             (row, x) <- chars.zipWithIndex
