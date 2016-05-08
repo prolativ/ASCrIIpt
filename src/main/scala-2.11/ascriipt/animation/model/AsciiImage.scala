@@ -9,7 +9,7 @@ case class AsciiImage(chars: Array[Array[Char]], transparent: Char = '\0') exten
             (char, y) <- row.zipWithIndex
         } {
             if(char != transparent) {
-                canvas.drawChar(x, y, char)
+                canvas.drawChar(y, x, char)
             }
         }
     }

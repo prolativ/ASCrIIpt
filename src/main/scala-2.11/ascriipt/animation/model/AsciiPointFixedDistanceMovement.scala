@@ -17,5 +17,5 @@ class AsciiPointFixedDistanceMovement(
         }
     }
 
-    override def baseDuration: AnimationDuration = MinimalDuration(0)
+    override def baseDuration: AnimationDuration = MinimalDuration(20)
 }
