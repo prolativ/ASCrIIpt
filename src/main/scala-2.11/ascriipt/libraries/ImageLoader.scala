@@ -6,7 +6,11 @@ import com.sksamuel.scrimage.Image
 import java.io.File
 import java.nio.file.NoSuchFileException
 
-class ImageLoader(var path: String) {
+object PixelToAsciiMapper {
+
+}
+
+class ImageLoader(val path: String) {
   protected val image: Image = loadImage(path)
 
   protected def loadImage(path: String): Image = {
@@ -19,10 +23,12 @@ class ImageLoader(var path: String) {
     }
   }
 
+  def map(number: Int): Char = if (number == -1)'\0' else '|'
+
   def toAsciiImage: AsciiImage = {
-    val imageToAscii = Array.tabulate[Char](image.width, image.height) {
-      (i, j) => if (image.pixel(i, j).toInt == -1) '\0' else '|'
-    }
-    new AsciiImage(imageToAscii)
+    new AsciiImage(
+      Array.tabulate[Char](image.height, image.width) {
+        (i, j) => map(image.pixel(j, i).toInt)
+    })
   }
 }
