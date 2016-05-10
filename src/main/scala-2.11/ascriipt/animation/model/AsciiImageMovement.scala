@@ -2,14 +2,14 @@ package ascriipt.animation.model
 
 import ascriipt.animation.visualisation.Canvas
 
-class AsciiImageMovement(startX: Int,
+case class AsciiImageMovement(startX: Int,
                          startY: Int,
                          dx: Int,
                          dy: Int,
                          filling: Char,
                          asciiImage: AsciiImage
                         ) extends Animation {
-  override def baseDuration: AnimationDuration = MinimalDuration(20)
+  override def baseDuration: AnimationDuration = MinimalDuration(0)
 
   override def draw(atTime: Long, totalDuration: Long)(implicit canvas: Canvas): Unit = {
     if(atTime < totalDuration) {

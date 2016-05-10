@@ -2,13 +2,16 @@ package ascriipt.animation.model
 
 import ascriipt.animation.visualisation.Canvas
 
-class SequentialAnimation(subanimations: Seq[Animation]) extends Animation {
+case class SequentialAnimation(subanimations: Seq[Animation]) extends Animation {
 
     override def draw(atTime: Long, totalDuration: Long)(implicit canvas: Canvas): Unit = {
+        val (exactDurations, minimalDurations) = AnimationDuration.partition(subanimations.map(_.baseDuration))
         val durations = subanimations.map { animation =>
                 animation.baseDuration match {
-                    case ExactDuration(exactDurationValue) if (exactDurationValue == totalDuration) => exactDurationValue
-                    case MinimalDuration(minDurationValue) if (minDurationValue == totalDuration) => totalDuration - minDurationValue
+                    case ExactDuration(exactDurationValue) =>
+                      exactDurationValue
+                    case MinimalDuration(minDurationValue) =>
+                        (totalDuration - exactDurations.map(_.value).sum)/minimalDurations.size
                     case _ => throw AnimationTimeException(
                         s"Cannot calculate duration filling while drawing sequential animation: ${subanimations}"
                     )

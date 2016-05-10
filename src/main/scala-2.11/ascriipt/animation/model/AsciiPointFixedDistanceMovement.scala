@@ -2,7 +2,7 @@ package ascriipt.animation.model
 
 import ascriipt.animation.visualisation.Canvas
 
-class AsciiPointFixedDistanceMovement(
+case class AsciiPointFixedDistanceMovement(
                           startX: Int,
                           startY: Int,
                           dx: Int,
@@ -17,5 +17,5 @@ class AsciiPointFixedDistanceMovement(
         }
     }
 
-    override def baseDuration: AnimationDuration = MinimalDuration(20)
+    override def baseDuration: AnimationDuration = MinimalDuration(0)
 }
