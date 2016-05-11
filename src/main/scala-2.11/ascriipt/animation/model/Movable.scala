@@ -9,7 +9,6 @@ trait Movable extends Animation {
   val startY: Int
   val endX: Int
   val endY: Int
-  val filling: Char
 
   override def draw(atTime: Long, totalDuration: Long)(implicit canvas: Canvas): Unit = {
     val dx = endX - startX

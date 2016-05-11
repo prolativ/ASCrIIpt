@@ -9,6 +9,15 @@ class FakeCanvas(width: Int, height: Int) extends Canvas {
   screen.startScreen()
   clear()
 
+  new Thread(new Runnable {
+    override def run(): Unit = {
+      while (screen.readInput() == null) {
+        Thread.sleep(100)
+      }
+      System.exit(1)
+    }
+  }).start()
+
   override def clear(): Unit = canvas = Array.fill(height, width)('.')
 
   override def drawChar(startingPoint: (Int, Int), char: Char): Unit = {
