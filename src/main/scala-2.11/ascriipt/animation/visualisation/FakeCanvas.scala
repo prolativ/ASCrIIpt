@@ -11,9 +11,11 @@ class FakeCanvas(width: Int, height: Int) extends Canvas {
 
   override def clear(): Unit = canvas = Array.fill(height, width)('.')
 
-  override def drawChar(x: Int, y: Int, char: Char): Unit =
+  override def drawChar(startingPoint: (Int, Int), char: Char): Unit = {
+    val (x, y) = startingPoint
     if (y < height && x < width)
       canvas(y)(x) = char
+  }
 
   override def show(): Unit = {
     val terminal = screen.getTerminal
@@ -39,7 +41,7 @@ object FakeCanvas {
 //    val sequence = ParallelAnimation(Seq(
 //      TimedWaiting(10),
 //      AsciiPointFixedDistanceMovement(0, 0, 4, 4, 'O'),
-//      AsciiPointFixedDistanceMovement(8, 8, -7, -7, 'X'),
+//      AsciiPointFixedDistanceMovement(8, 8, 0, 0, 'X'),
 //      AsciiPointFixedDistanceMovement(1, 2, 3, 7, 'A'),
 //      AsciiImageMovement(4, 4, 10, 10, '.', new AsciiImage(image))
 //    ))
@@ -54,14 +56,14 @@ object FakeCanvas {
       TimedWaiting(3),
       ParallelAnimation(Seq(
         TimedWaiting(4),
-        AsciiPointFixedDistanceMovement(14, 14, -5, -5, 'O')
+        AsciiPointFixedDistanceMovement(14, 14, 10, 10, 'O')
       ))
     ))
 
     val seq1 = ParallelAnimation(Seq(
       TimedWaiting(20),
       SequentialAnimation(Seq(
-        AsciiPointFixedDistanceMovement(4, 4, -5, -5, 'A')
+        AsciiPointFixedDistanceMovement(4, 4, 0, 0, 'A')
       ))
     ))
 
@@ -75,17 +77,17 @@ object FakeCanvas {
         UntimedWaiting,
         ParallelAnimation(Seq(
           TimedWaiting(7),
-          AsciiPointFixedDistanceMovement(4, 4, -5, -5, '^')
+          AsciiPointFixedDistanceMovement(4, 4, 0, 0, '^')
         ))
       ))
     ))
 
     val seq3 = ParallelAnimation(Seq(
       TimedWaiting(20),
-      AsciiImageMovement(0, 0, 8, 20, '.', new AsciiImage(image)),
-      AsciiImageMovement(20, 0, -8, 20, '.', new AsciiImage(image)),
-      AsciiImageMovement(0, 54, 8, -20, '.', new AsciiImage(image)),
-      AsciiImageMovement(20, 54, -8, -20, '.', new AsciiImage(image))
+      AsciiImageMovement(0, 0, 8, 20, '.', new AsciiImage(image))
+//      AsciiImageMovement(20, 0, 0, 20, '.', new AsciiImage(image)),
+//      AsciiImageMovement(0, 54, 8, 34, '.', new AsciiImage(image)),
+//      AsciiImageMovement(20, 54, 0, 34, '.', new AsciiImage(image))
 
     ))
 

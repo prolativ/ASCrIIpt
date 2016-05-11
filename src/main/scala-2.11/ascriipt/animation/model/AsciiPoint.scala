@@ -2,10 +2,8 @@ package ascriipt.animation.model
 
 import ascriipt.animation.visualisation.Canvas
 
-case class AsciiPoint(x: Int, y: Int, filling: Char) extends Animation {
-    override def draw(atTime: Long, totalDuration: Long)(implicit canvas: Canvas): Unit =  {
-        canvas.drawChar(x, y, filling)
+class AsciiPoint(x: Int, y: Int, filling: Char) extends AnimationObject {
+    override def draw(startingPoint: (Int, Int))(implicit canvas: Canvas): Unit =  {
+        canvas.drawChar(startingPoint, filling)
     }
-
-    override def baseDuration = MinimalDuration(0)
 }
