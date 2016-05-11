@@ -45,22 +45,23 @@ object FakeCanvas {
 //    ))
 
     val sequence = SequentialAnimation(Seq(
+      TimedWaiting(6),
       TimedWaiting(3),
       ParallelAnimation(Seq(
         TimedWaiting(4),
-        AsciiPointFixedDistanceMovement(0, 0, 4, 4, 'O')
+        AsciiPointFixedDistanceMovement(10, 10, 4, 4, 'O')
       )),
       TimedWaiting(3),
       ParallelAnimation(Seq(
         TimedWaiting(4),
-        AsciiPointFixedDistanceMovement(4, 4, -5, -5, 'O')
+        AsciiPointFixedDistanceMovement(14, 14, -5, -5, 'O')
       ))
     ))
 
     val seq1 = ParallelAnimation(Seq(
-      TimedWaiting(10),
+      TimedWaiting(20),
       SequentialAnimation(Seq(
-        AsciiPointFixedDistanceMovement(4, 4, -5, -5, 'O')
+        AsciiPointFixedDistanceMovement(4, 4, -5, -5, 'A')
       ))
     ))
 
@@ -69,12 +70,12 @@ object FakeCanvas {
       SequentialAnimation(Seq(
         ParallelAnimation(Seq(
           TimedWaiting(7),
-          AsciiPointFixedDistanceMovement(0, 0, 4, 4, 'O')
+          AsciiPointFixedDistanceMovement(0, 0, 4, 4, 'X')
         )),
         UntimedWaiting,
         ParallelAnimation(Seq(
           TimedWaiting(7),
-          AsciiPointFixedDistanceMovement(4, 4, -5, -5, 'O')
+          AsciiPointFixedDistanceMovement(4, 4, -5, -5, '^')
         ))
       ))
     ))
@@ -92,7 +93,9 @@ object FakeCanvas {
 //    drawAnimation(sequence)
 //    drawAnimation(seq1)
 //    drawAnimation(seq2)
-    drawAnimation(seq3)
+    drawAnimation(ParallelAnimation(Seq(
+      sequence, seq1, seq2, seq3
+    )))
   }
 
   def drawAnimation(animation: Animation): Unit = {

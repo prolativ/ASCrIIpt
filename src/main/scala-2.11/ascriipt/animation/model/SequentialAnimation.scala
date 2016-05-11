@@ -28,13 +28,16 @@ case class SequentialAnimation(subanimations: Seq[Animation]) extends Animation 
             case (exactDurations, Nil)
                 if exactDurations.nonEmpty => ExactDuration(exactDurations.map(_.value).sum)
 
-            case (exactDurations, minimalDuration :: Nil) =>
-                val minDurationValue = exactDurations.map(_.value).sum + minimalDuration.value
+//            case (exactDurations, minimalDuration :: Nil) =>
+//                val minDurationValue = exactDurations.map(_.value).sum + minimalDuration.value
+//                MinimalDuration(minDurationValue)
+            case (exactDurations, minimalDurations) =>
+                val minDurationValue = exactDurations.map(_.value).sum + minimalDurations.map(_.value).sum
                 MinimalDuration(minDurationValue)
 
-            case _ => throw AnimationTimeException(
-                s"Cannot compute base duration for sequential animation with subanimations: ${subanimations}"
-            )
+//            case _ => throw AnimationTimeException(
+//                s"Cannot compute base duration for sequential animation with subanimations: ${subanimations}"
+//            )
         }
     }
 }
