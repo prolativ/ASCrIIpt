@@ -9,7 +9,7 @@ class FakeCanvas(width: Int, height: Int) extends Canvas {
   screen.startScreen()
   clear()
 
-  override def clear(): Unit = canvas = Array.fill(height, width)('.')
+  override def clear(): Unit = canvas = Array.fill(height, width)(' ')
 
   override def drawChar(x: Int, y: Int, char: Char): Unit = canvas(y)(x) = char
 
@@ -35,10 +35,11 @@ object FakeCanvas {
       Array('\0', '\0', '-', '-', '\0', '\0')
     )
     val movementsSeq = Seq(
-      new AsciiPointFixedDistanceMovement(0, 0, 4, 4, 'O'),
+      new AsciiPointFixedDistanceMovement(0, 0, 4, 4, 'Z'),
       new AsciiPointFixedDistanceMovement(8, 8, -7, -7, 'X'),
       new AsciiImageMovement(4, 4, 10, 10, '.', new AsciiImage(image))
     )
+
     drawAnimation(new ParallelAnimation(movementsSeq))
   }
 
