@@ -25,7 +25,7 @@ class FakeCanvas(width: Int, height: Int) extends Canvas {
 }
 
 object FakeCanvas {
-  def main(args: Array[String]) {
+  /*def main(args: Array[String]) {
     val image = Array(
       Array('\0', '\0', '-', '-', '\0', '\0'),
       Array('\0', '/', '\0', '\0', '\\', '\0'),
@@ -65,5 +65,5 @@ object FakeCanvas {
         case _ => throw AnimationTimeException("Root animation has to have exact duration given.")
       }
     }
-  }
+  }*/
 }

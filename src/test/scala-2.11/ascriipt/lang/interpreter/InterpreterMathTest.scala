@@ -7,8 +7,9 @@ import Matchers._
 class InterpreterMathTest extends FlatSpecLike {
     behavior of "Interpreter"
 
-    val interpreter = new BasicInterpreter
+    val interpreter = new BasicEvaluator(LangStdDependencyResolver)
     import interpreter.eval
+    implicit def staticCommandScope = CommandScope.empty
 
     trait EmptyScopeContextFixture {
         implicit val varScope = RootScope(Map())

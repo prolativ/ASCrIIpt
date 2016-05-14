@@ -1,13 +1,16 @@
 package ascriipt.lang.parser
 
+import java.io.FileReader
+
+import ascriipt.lang.common.{UntypedArgumentSlot, PatternWord, CommandSignature, SignatureElement}
+import ascriipt.lang.interpreter.AscriiptModule
+
 import scala.util.parsing.combinator.JavaTokenParsers
 import ascriipt.lang.ast._
 
+import scala.util.parsing.input.CharSequenceReader
+
 class AscriiptParser extends JavaTokenParsers {
-
-    /*private def rep2sep[A]: Parser[Seq[A]] = {
-
-    }*/
 
     //private val newLine = sys.props("line.separator")
 
@@ -22,7 +25,16 @@ class AscriiptParser extends JavaTokenParsers {
     val signatureArgumentMarker = "_"
     val statementSeparator = ";"
     val objectKeyword = "object"
-    def programModule: Parser[ObjectBody] = objectBody
+    val importKeyword = "import"
+    val importFromKeyword = "from"
+    
+    def programModule: Parser[ModuleBody] = {
+        rep(importStatement <~ statementSeparator) ~
+            rep(assignment <~ statementSeparator) ~ rep(commandDef <~ statementSeparator) ^^ {
+            case importStatements ~ assignments ~ commandDefs =>
+                ModuleBody(importStatements, assignments, commandDefs)
+        }
+    }
     def objectDef: Parser[ObjectBody] = objectKeyword ~> leftParen ~> objectBody <~ rightParen
     def objectBody: Parser[ObjectBody] = {(
         //(repsep(assignment, statementSeparator) <~ opt(statementSeparator)) ~
@@ -30,21 +42,31 @@ class AscriiptParser extends JavaTokenParsers {
         rep(assignment <~ statementSeparator) ~ rep(commandDef <~ statementSeparator)
         ) ^^ { case assignments ~ commandDefs => ObjectBody(assignments, commandDefs) }
     }
+    
+    def importStatement: Parser[ImportStatement] = /*selectiveImport |*/ moduleImport
+    /*def selectiveImport: Parser[SelectiveImport] = {
+        (importFromKeyword -> moduleName) ~ (importKeyword ~> commandPattern)
+    }*/
+    def moduleImport: Parser[ModuleImport] = importKeyword ~> moduleIdent ^^ ModuleImport
+    
+    def moduleIdent = ident
 
     def assignment: Parser[Assignment] = variable ~ (assignmentOper ~> expression) ^^ {
         case variable ~ expression => Assignment(variable, expression)
     }
+
     def emptyList: Parser[ListObject] = listSeparator ^^^ ListObject(List())
-    def oneElementList: Parser[ListObject] = additiveExpression <~ listSeparator ^^ (expr => ListObject(List(expr)))
+    def oneElementList: Parser[ListObject] = listElement <~ listSeparator ^^ (expr => ListObject(List(expr)))
     def mulitElementList: Parser[ListObject] = {
-        additiveExpression ~ listSeparator ~ rep1sep(additiveExpression, listSeparator) <~ opt(listSeparator) ^^ {
+        listElement ~ listSeparator ~ rep1sep(listElement, listSeparator) <~ opt(listSeparator) ^^ {
             case elem ~ _ ~ elems => ListObject(elem +: elems)
         }
     }
     def list: Parser[ListObject] = mulitElementList | oneElementList | emptyList
 
-    def expression: Parser[Expression] = commandCall | argumentlikeExpression
-    def argumentlikeExpression: Parser[Expression] = list | additiveExpression
+    def expression = list | listElement
+    def listElement: Parser[Expression] = commandCall | argumentlikeExpression
+    def argumentlikeExpression: Parser[Expression] = additiveExpression
     def additiveExpression: Parser[Expression] = chainl1(multiplicativeExpression, "+" ^^^ Addition | "-" ^^^ Substraction)
     def multiplicativeExpression: Parser[Expression] = chainl1(atomicExpression, "*" ^^^ Multiplication | "/" ^^^ Division)
     def atomicExpression: Parser[Expression] = (
@@ -52,7 +74,7 @@ class AscriiptParser extends JavaTokenParsers {
             stringLiteral ^^ (s => StringConst(s)) |
             objectDef |
             variable |
-            leftParen ~> argumentlikeExpression <~ rightParen
+            leftParen ~> expression <~ rightParen
         )
 
     /*def expression: Parser[Expression] = (
@@ -67,10 +89,15 @@ class AscriiptParser extends JavaTokenParsers {
             leftParen ~> expression <~ rightParen
         )*/
 
-    def expressionWithBindings = rep(assignment) ~ additiveExpression ^^ {
+    def expressionWithBindings = rep(assignment) ~ expression ^^ {
         case assignments ~ expr => ExpressionWithBindings(assignments, expr)
     }
 
+    def signaturePatternWord = ident ^^ (id => (PatternWord(id), None))
+    def signatureArgument = argumentlikeExpression ^^ (expr => (UntypedArgumentSlot, Some(expr)))
+    def signatureVariable =  variable ^^ (varId => (UntypedArgumentSlot, Some(varId)))
+    def signatureCallElement = signaturePatternWord | signatureArgument
+    def signatureDefElement = signaturePatternWord | signatureVariable
 
     def commandCall: Parser[CommandCall] = {
         def mkSignatureWithArgs(slots: Seq[(SignatureElement, Option[Expression])]): (CommandSignature, Seq[Expression]) = {
@@ -81,13 +108,10 @@ class AscriiptParser extends JavaTokenParsers {
 
         def signatureWithArgs = {
             (
-                ident ^^ (id => (PatternWord(id), None))
-                    | argumentlikeExpression ^^ (expr => (ArgumentSlot, Some(expr)))
-                ) ~
-            rep1(
-                ident ^^ (id => (PatternWord(id), None))
-                    | argumentlikeExpression ^^ (expr => (ArgumentSlot, Some(expr)))
-            ) ^^ { case elem ~ elems => mkSignatureWithArgs(elem +: elems) }
+                signatureCallElement ~ rep1(signatureCallElement) ^^ {
+                    case elem ~ elems => mkSignatureWithArgs(elem +: elems)
+                } | signaturePatternWord ^^ { elem => mkSignatureWithArgs(Seq(elem)) }
+            )
         }
 
         signatureWithArgs ^^ {
@@ -104,19 +128,30 @@ class AscriiptParser extends JavaTokenParsers {
 
         def signatureWithArgs = {
             (
-                ident ^^ (id => (PatternWord(id), None))
-                    | variable ^^ (varId => (ArgumentSlot, Some(varId)))
-                ) ~
-            rep1(
-                ident ^^ (id => (PatternWord(id), None))
-                | variable ^^ (varId => (ArgumentSlot, Some(varId)))
-            ) ^^ { case elem ~ elems => mkSignatureWithArgs(elem +: elems) }
+                signatureDefElement ~ rep1(signatureDefElement) ^^ {
+                    case elem ~ elems => mkSignatureWithArgs(elem +: elems)
+                } | signaturePatternWord ^^ { elem => mkSignatureWithArgs(Seq(elem)) }
+            )
         }
 
-        signatureWithArgs ~ assignmentOper ~ additiveExpression ^^ {
+        signatureWithArgs ~ assignmentOper ~ expression ^^ {
             case (signature, arguments) ~ _ ~ returnResult => CommandDef(signature, arguments, returnResult)
         }
     }
 
     def variable: Parser[Variable] = variableMarker ~> ident ^^ Variable
+
+
+    def parseModule(input: FileReader): ParseResult[AstNode] = parseAll(phrase(programModule), input)
+    def parseModule(input: String): ParseResult[AstNode] = parseAll(phrase(programModule), input)
+    
+    def parseHappy[T](parser: Parser[T], input: String): T = {
+        val phraseParser = phrase(parser)
+        val reader = new CharSequenceReader(input)
+        phraseParser(reader) match {
+            case Success(t,_)     => t
+            case NoSuccess(msg, inputLeft) => throw new IllegalArgumentException(
+                s"Could not parse '$input': $msg")
+        }
+    }
 }

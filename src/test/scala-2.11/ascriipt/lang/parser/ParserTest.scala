@@ -1,6 +1,7 @@
 package ascriipt.lang.parser
 
 import ascriipt.lang.ast._
+import ascriipt.lang.common.{UntypedArgumentSlot, PatternWord, CommandSignature}
 import org.scalatest._
 import Matchers._
 
@@ -40,13 +41,67 @@ class ParserTest extends AscriiptParser with FlatSpecLike {
         parsing(input) shouldEqual Substraction(IntConst(4), IntConst(2))
     }
 
+    it should "parse a complex expression" in {
+        implicit val testedParser = expression
+        val input = """2 + 3 * 4"""
+
+        parsing(input) shouldEqual Addition(IntConst(2), Multiplication(IntConst(3), IntConst(4)))
+    }
+
     it should "parse a command call" in {
         implicit val testedParser = commandCall
-        val input = """foo $a"""
 
-        parsing(input) shouldEqual CommandCall(
-            CommandSignature(Seq(PatternWord("foo"), ArgumentSlot)),
+        parsing("foo") shouldEqual CommandCall(
+            CommandSignature(Seq(PatternWord("foo"))),
+            Seq()
+        )
+
+        parsing("foo $a") shouldEqual CommandCall(
+            CommandSignature(Seq(PatternWord("foo"), UntypedArgumentSlot)),
             Seq(Variable("a"))
+        )
+
+        parsing("$a foo") shouldEqual CommandCall(
+            CommandSignature(Seq(UntypedArgumentSlot, PatternWord("foo"))),
+            Seq(Variable("a"))
+        )
+
+        parsing("$a foo $b") shouldEqual CommandCall(
+            CommandSignature(Seq(UntypedArgumentSlot, PatternWord("foo"), UntypedArgumentSlot)),
+            Seq(Variable("a"), Variable("b"))
+        )
+    }
+
+    it should "parse a trivial command def" in {
+        implicit val testedParser = commandDef
+
+        parsing("foo $a = 1") shouldEqual CommandDef(
+            CommandSignature(Seq(PatternWord("foo"), UntypedArgumentSlot)),
+            Seq(Variable("a")),
+            IntConst(1)
+        )
+    }
+
+    it should "parse a command def using a var" in {
+        implicit val testedParser = commandDef
+
+        parsing("foo $a = $a") shouldEqual CommandDef(
+            CommandSignature(Seq(PatternWord("foo"), UntypedArgumentSlot)),
+            Seq(Variable("a")),
+            Variable("a")
+        )
+    }
+
+    it should "parse a command def calling another command" in {
+        implicit val testedParser = commandDef
+
+        parsing("foo $a = (bar 1)") shouldEqual CommandDef(
+            CommandSignature(Seq(PatternWord("foo"), UntypedArgumentSlot)),
+            Seq(Variable("a")),
+            CommandCall(
+                CommandSignature(Seq(PatternWord("bar"), UntypedArgumentSlot)),
+                Seq(IntConst(1))
+            )
         )
     }
 }
