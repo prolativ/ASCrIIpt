@@ -1,0 +1,15 @@
+import "geom";
+
+point $filling = {
+  place $this at $x $y = {
+    show $this = show point $filling at $x $y;
+  };
+
+  show $this at $x $y = show (place $this at $x $y);
+};
+
+test point = par(
+  show (place (point "w") at 4 7),
+  show (place (point "w") at 4 7),
+  wait 1000
+);

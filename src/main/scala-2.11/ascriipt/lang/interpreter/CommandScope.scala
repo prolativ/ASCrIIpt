@@ -1,34 +1,53 @@
 package ascriipt.lang.interpreter
 
-import ascriipt.lang.common.{Command, CommandSignature}
+import ascriipt.common.AscriiptException
+import ascriipt.lang.common.{LocalCommand, AbstractCommand, Command, CommandSignature}
 
-class CommandScope private(commandsBySignature: Map[CommandSignature, Command]) {
+sealed trait AbstractCommandScope[C <: AbstractCommand, Self <: AbstractCommandScope[C, Self]] {
+  protected val commandsBySignature: Map[CommandSignature, C] = {
+    commands.map(command => command.signature -> command).toMap
+  }
 
-    def add(commands: Command*): CommandScope = {
-        val newEntries = commands.map(cmd => cmd.signature -> cmd)
-        new CommandScope(commandsBySignature ++ newEntries)
-    }
+  def commands: Seq[C]
 
-    def resolve(signature: CommandSignature): Option[Command] = {
-        commandsBySignature.get(signature)
-    }
+  def resolve(signature: CommandSignature): Option[C] = {
+    commandsBySignature.get(signature)
+  }
 
-    def call(signature: CommandSignature, arguments: Seq[Any]) = {
-        resolve(signature).get.call(arguments)
-    }
+  def handles(signature: CommandSignature): Boolean = resolve(signature).isDefined
 
-    def handles(signature: CommandSignature): Boolean = resolve(signature).isDefined
+  def ++(that: Self): Self
+}
 
-    def commands: Seq[Command] = commandsBySignature.values.toSeq
+case class CommandScope(commands: Seq[Command]) extends AbstractCommandScope[Command, CommandScope]{
 
-    def ++(that: CommandScope) = CommandScope(this.commands ++ that.commands)
+  if(commands.distinct.length != commands.length){
+    throw new AscriiptException("Command name not unique"){}
+  }
+
+  def call(signature: CommandSignature, arguments: Seq[Any]) = {
+    resolve(signature).get.call(arguments)
+  }
+
+  def ++(that: CommandScope): CommandScope = CommandScope(this.commands ++ that.commands)
+}
+
+case class LocalCommandScope (commands: Seq[LocalCommand]) extends AbstractCommandScope[LocalCommand, LocalCommandScope]{
+  def call(signature: CommandSignature, arguments: Seq[Any])(localCommandScope: LocalCommandScope) = {
+    resolve(signature).get.call(arguments)(localCommandScope)
+  }
+
+  def ++(that: LocalCommandScope): LocalCommandScope = LocalCommandScope(this.commands ++ that.commands)
+
+  def toCommandScope: CommandScope = {
+    CommandScope(commands.map(_.toAbsoluteCommand(this)))
+  }
 }
 
 object CommandScope {
-    def empty: CommandScope = new CommandScope(Map[CommandSignature, Command]())
+  def empty: CommandScope = CommandScope(Seq.empty)
+}
 
-    def apply(commands: Seq[Command]): CommandScope = {
-        empty.add(commands: _*)
-    }
-
+object LocalCommandScope {
+  def empty: LocalCommandScope = LocalCommandScope(Seq.empty)
 }

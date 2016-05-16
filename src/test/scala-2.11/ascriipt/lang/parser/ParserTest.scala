@@ -4,6 +4,7 @@ import ascriipt.lang.ast._
 import ascriipt.lang.common.{UntypedArgumentSlot, PatternWord, CommandSignature}
 import org.scalatest._
 import Matchers._
+import ascriipt.lang.common.SignatureHelpers._
 
 import scala.util.parsing.input.CharSequenceReader
 
@@ -32,6 +33,13 @@ class ParserTest extends AscriiptParser with FlatSpecLike {
         val input = """$a"""
 
         parsing(input) shouldEqual Variable("a")
+    }
+
+    it should "parse a string" in {
+        implicit val testedParser = expression
+        val input = " \"abc123\" "
+
+        parsing(input) shouldEqual StringConst("abc123")
     }
 
     it should "parse an binary expression" in {
@@ -103,5 +111,22 @@ class ParserTest extends AscriiptParser with FlatSpecLike {
                 Seq(IntConst(1))
             )
         )
+    }
+
+    it should "parse a variable assignment" in {
+        implicit val testedParser = assignment
+
+        parsing("$a = 1") shouldEqual Assignment(
+          Variable("a"),
+          IntConst(1)
+        )
+
+      parsing("$a = foo 1") shouldEqual Assignment(
+        Variable("a"),
+        CommandCall(
+            CommandSignature(Seq("foo", __)),
+            Seq(IntConst(1))
+        )
+      )
     }
 }
