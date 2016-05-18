@@ -2,8 +2,8 @@ import "geom";
 
 
 show rect $width $height of $filling right $x top $y = show rect $width $height of $filling left ($x - $width + 1) top $y;
-show rect $width $height of $filling left $x bottom $y = show rect $width $height of $filling left $x top ($y + $height - 1);
-show rect $width $height of $filling right $x bottom $y = show rect $width $height of $filling left ($x - $width + 1) top ($y + $height - 1);
+show rect $width $height of $filling left $x bottom $y = show rect $width $height of $filling left $x top ($y - $height + 1);
+show rect $width $height of $filling right $x bottom $y = show rect $width $height of $filling left ($x - $width + 1) top ($y - $height + 1);
 
 
 rect $width $height of $filling = {

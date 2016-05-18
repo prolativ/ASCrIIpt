@@ -17,5 +17,5 @@ triangle up $base $height of $filling = {
 
 test triangle = par(
   wait 2000,
-  show triangle up 16 10 of "^" right 20 bottom 20
+  show triangle up 16 10 of "^" right 20 bottom 10
 );

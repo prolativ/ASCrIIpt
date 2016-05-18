@@ -14,37 +14,37 @@ house $width $wallHeight $roofHeight = {
 	$this roof = $roof;
 	roof of $this = $roof;
 
-	place house $this left $x bottom $y = {
+	place $this left $x bottom $y = {
 		$placedWall = place $wall left $x bottom $y;
-		$placedRoof = place $roof left $x bottom ($y - $wallHeight);
+		$placedRoof = place $roof left $x bottom ($y - $wallHeight + 1);
 
-		show house $this = par(
+		show $this = par(
 			show $placedWall,
 			show $placedRoof
 		);
 	};
 
-  place house $this right $x bottom $y = {
+  place $this right $x bottom $y = {
     $placedWall = place $wall right $x bottom $y;
-    $placedRoof = place $roof right $x bottom ($y - $wallHeight);
+    $placedRoof = place $roof right $x bottom ($y - $wallHeight + 1);
 
-    show house $this = par(
+    show $this = par(
       show $placedWall,
       show $placedRoof
     );
   };
 
 
-	show house $this left $x bottom $y = show (place house $this left $x bottom $y);
-	show house $this right $x bottom $y = show (place house $this right $x bottom $y);
+	show $this left $x bottom $y = show (place $this left $x bottom $y);
+	show $this right $x bottom $y = show (place $this right $x bottom $y);
 };
 
 
-show house $width $wallHeight $roofHeight left $x bottom $y = show house (house $width $wallHeight $roofHeight) left $x bottom $y;
-show house $width $wallHeight $roofHeight right $x bottom $y = show house (house $width $wallHeight $roofHeight) right $x bottom $y;
+show house $width $wallHeight $roofHeight left $x bottom $y = show (house $width $wallHeight $roofHeight) left $x bottom $y;
+show house $width $wallHeight $roofHeight right $x bottom $y = show (house $width $wallHeight $roofHeight) right $x bottom $y;
 
 
 test house = par(
 	wait 2000,
-	show house 16 6 6 left 20 bottom 20
+	show house 16 5 6 left 5 bottom 20
 );

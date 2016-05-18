@@ -13,13 +13,16 @@ class BasicEvaluator(
 
     case CommandCall(signature, arguments) =>
       val evaluatedArguments = arguments.map(eval)
-      if (staticCommandScope.handles(signature)) {
-        staticCommandScope.call(signature, evaluatedArguments)
-      } else {
-        evaluatedArguments.collectFirst {
-          case AscriiptObject(varScope, commandScope) if commandScope.handles(signature) =>
-            commandScope.call(signature, evaluatedArguments)
-        }.getOrElse(throw EvaluationException(astNode))
+
+      evaluatedArguments.collectFirst {
+        case AscriiptObject(varScope, commandScope) if commandScope.handles(signature) =>
+          commandScope.call(signature, evaluatedArguments)
+      }.getOrElse{
+        if (staticCommandScope.handles(signature)) {
+          staticCommandScope.call(signature, evaluatedArguments)
+        } else {
+          throw EvaluationException(astNode)
+        }
       }
 
     case ExpressionWithBindings(assignments, expression) =>
@@ -87,7 +90,7 @@ class BasicEvaluator(
     CommandScope(importedCommands)
   }
 
-  private def evalCommandDefs(
+  def evalCommandDefs(
                                  commandDefs: Seq[CommandDef]
                                  )(varScope: VarScope, externalCommandScope: CommandScope): CommandScope = {
     val localCommands = commandDefs.map {
