@@ -10,7 +10,7 @@ class AsciiImage(val chars: Array[Array[Char]], val transparent: Char = '\0') ex
             (char, y) <- row.zipWithIndex
         } {
             if(char != transparent) {
-                canvas.drawChar((startY + y, startX + x), char)
+                canvas.setChar((startY + y, startX + x), char)
             }
         }
     }
