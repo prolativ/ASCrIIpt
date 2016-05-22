@@ -28,17 +28,23 @@ class FakeCanvas(width: Int, height: Int) extends Canvas {
 
 object FakeCanvas {
   def main(args: Array[String]): Unit = {
-    val sequence = SequentialAnimation(Seq(
-      TimedWaiting(1000),
+    val sequence = ParallelAnimation(Seq(
+      TimedWaiting(6500),
+      SequentialAnimation(Seq(
       ParallelAnimation(Seq(
-        TimedWaiting(300),
-        AsciiPointFixedDistanceMovement(0, 0, 4, 4, 'O')
+        TimedWaiting(3000),
+        new AsciiPoint('O', (20, 20)) with MovementByVector {val dx= -20; val dy= -20}
       )),
-      TimedWaiting(1000),
+      TimedWaiting(500),
       ParallelAnimation(Seq(
-        TimedWaiting(300),
-        AsciiPointFixedDistanceMovement(4, 4, 0, 0, 'O')
+        TimedWaiting(3000),
+        new AsciiPoint('O') with MovementByVector {val dx=20; val dy=20; override val baseDuration=MinimalDuration(10)}
       ))
+    )),
+      new AsciiPoint('M', (5, 10)) with Still,
+      new AsciiPoint('X', (40, 24)) with Still,
+      new AsciiImage(Array(Array('z', 'x'), Array('c', 'b')), (1, 1)) with Still,
+      new AsciiImage(Array(Array('z', 'x'), Array('c', 'b')), (6, 14)) with MovementByVector {val dx=20; val dy=15}
     ))
     drawAnimation(sequence)
 

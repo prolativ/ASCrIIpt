@@ -2,7 +2,7 @@ package ascriipt.animation.model
 
 import ascriipt.animation.visualisation.Canvas
 
-class AsciiImage(val chars: Array[Array[Char]], val transparent: Char = '\0') extends AnimationObject {
+class AsciiImage(val chars: Array[Array[Char]], val point: (Int, Int) = (0, 0), val transparent: Char = '\0') extends AnimationObject {
     override def draw(startingPoint: (Int, Int))(implicit canvas: Canvas): Unit = {
         val (startX, startY) = startingPoint
         for {
