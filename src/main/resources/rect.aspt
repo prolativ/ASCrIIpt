@@ -1,0 +1,37 @@
+import "geom";
+
+show rect $width $height of $filling right $x top $y = show rect $width $height of $filling left ($x - $width + 1) top $y;
+show rect $width $height of $filling left $x bottom $y = show rect $width $height of $filling left $x top ($y - $height + 1);
+show rect $width $height of $filling right $x bottom $y = show rect $width $height of $filling left ($x - $width + 1) top ($y - $height + 1);
+
+
+rect $width $height of $filling = {
+  place $this left $x top $y = {
+    show $this = show rect $width $height of $filling left $x top $y;
+  };
+
+  place $this right $x top $y = {
+    show $this = show rect $width $height of $filling right $x top $y;
+  };
+
+  place $this left $x bottom $y = {
+    show $this = show rect $width $height of $filling left $x bottom $y;
+  };
+
+  place $this right $x bottom $y = {
+    show $this = show rect $width $height of $filling right $x bottom $y;
+  };
+
+  show $this left $x top $y = show (place $this left $x top $y);
+  show $this right $x bottom $y = show (place $this right $x bottom $y);
+  show $this left $x top $y = show (place $this left $x top $y);
+  show $this right $x bottom $y = show (place $this right $x bottom $y);
+
+};
+
+
+test rect = par(
+  wait 2000,
+  show (rect 8 8 of "/") left 0 top 10,
+  show (place (rect 3 3 of "X") right 17 bottom 12)
+);

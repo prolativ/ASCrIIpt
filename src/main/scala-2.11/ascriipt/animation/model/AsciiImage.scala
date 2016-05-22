@@ -2,16 +2,17 @@ package ascriipt.animation.model
 
 import ascriipt.animation.visualisation.Canvas
 
-class AsciiImage(val chars: Array[Array[Char]], val point: (Int, Int) = (0, 0), val transparent: Char = '\0') extends AnimationObject {
-    override def draw(startingPoint: (Int, Int))(implicit canvas: Canvas): Unit = {
-        val (startX, startY) = startingPoint
-        for {
-            (row, x) <- chars.zipWithIndex
-            (char, y) <- row.zipWithIndex
-        } {
-            if(char != transparent) {
-                canvas.setChar((startY + y, startX + x), char)
-            }
-        }
+case class AsciiImage(leftX: Int, topY: Int, chars: Array[Array[Char]], transparent: Char = '\0') extends Animation {
+  override def draw(atTime: Long, totalDuration: Long)(implicit canvas: Canvas): Unit = {
+    for {
+      (row, x) <- chars.zipWithIndex
+      (char, y) <- row.zipWithIndex
+    } {
+      if (char != transparent) {
+        canvas.setChar((x + leftX, y + topY), char)
+      }
     }
+  }
+
+  override def baseDuration = MinimalDuration(0)
 }

@@ -1,5 +1,7 @@
 package ascriipt.lang.ast
 
+import ascriipt.lang.common.CommandSignature
+
 sealed trait AstNode
 
 sealed trait Expression extends AstNode
@@ -8,34 +10,40 @@ case class IntConst(value: Int) extends Expression
 
 case class StringConst(value: String) extends Expression
 
-sealed trait SignatureElement
+case class Variable(name: String) extends Expression
 
-case class Variable(name: String) extends Expression with SignatureElement
+case class CommandCall(signature: CommandSignature, arguments: Seq[Expression]) extends Expression
 
-case class ClassObject(bindings: List[Assignment], commandDefs: List[CommandDef]) extends AstNode
-
-case class ListObject(elements: List[Expression]) extends Expression
-
-case class PatternWord(value: String) extends SignatureElement
-
-case class CommandSignature(patternWords: List[String]) extends AstNode
-
-case class CommandCall(signature: CommandSignature, arguments: List[Expression]) extends Expression
-
-case class CommandDef(signature: CommandSignature, arguments: List[Variable], returnVal: Expression) extends AstNode
+case class CommandDef(signature: CommandSignature, arguments: Seq[Variable], returnVal: Expression) extends AstNode
 
 case class Assignment(variable: Variable, value: Expression) extends AstNode
 
+case class ExpressionWithBindings(assignments: Seq[Assignment], expression: Expression) extends Expression
+
+case class ListObject(elements: Seq[Expression]) extends Expression
+
+case class ObjectBody(bindings: Seq[Assignment], commandDefs: Seq[CommandDef]) extends Expression
+
+sealed trait ImportStatement
+
+//case class SelectiveImport(moduleName: String, commandPattern: String) extends ImportStatement
+
+case class ModuleImport(moduleName: String) extends ImportStatement
+
+case class ModuleBody(commandImports: Seq[ImportStatement], bindings: Seq[Assignment], commandDefs: Seq[CommandDef])
+    extends AstNode
+
+
 //sealed trait MathExpression extends Expression
 
-case class Add(left: Expression, right: Expression) extends Expression
+case class Addition(left: Expression, right: Expression) extends Expression
 
-case class Substract(left: Expression, right: Expression) extends Expression
+case class Substraction(left: Expression, right: Expression) extends Expression
 
-case class Multiply(left: Expression, right: Expression) extends Expression
+case class Multiplication(left: Expression, right: Expression) extends Expression
 
-case class Divide(left: Expression, right: Expression) extends Expression
+case class Division(left: Expression, right: Expression) extends Expression
 
-case class Negate(value: Expression) extends Expression
+case class UnaryMinus(value: Expression) extends Expression
 
 

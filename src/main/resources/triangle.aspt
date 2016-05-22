@@ -1,0 +1,21 @@
+import "geom";
+
+show triangle up $base $height of $filling left $x bottom $y = show triangle of $filling spanned by $x $y ($x + $base / 2 - 1) ($y - $height + 1) ($x + $base - 1) $y;
+show triangle up $base $height of $filling right $x bottom $y = show triangle of $filling spanned by ($x - $base + 1) $y ($x - $base / 2 + 1) ($y - $height + 1) $x $y;
+
+triangle up $base $height of $filling = {
+  place $this left $x bottom $y = {
+    show $this = show triangle up $base $height of $filling left $x bottom $y;
+  };
+  place $this right $x bottom $y = {
+    show $this = show triangle up $base $height of $filling right $x bottom $y;
+  };
+
+  show $this left $x bottom $y = show (place $this left $x bottom $y);
+  show $this right $x bottom $y = show (place $this right $x bottom $y);
+};
+
+test triangle = par(
+  wait 2000,
+  show triangle up 16 10 of "^" right 20 bottom 10
+);

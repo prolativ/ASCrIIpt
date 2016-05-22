@@ -1,5 +1,3 @@
 package ascriipt.common
 
-abstract class AscriiptException extends Exception {
-    def message: String
-}
+abstract class AscriiptException(message: String) extends Exception(message)

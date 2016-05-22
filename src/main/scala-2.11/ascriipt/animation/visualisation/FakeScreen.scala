@@ -1,9 +1,10 @@
 package ascriipt.animation.visualisation
 
 import ascriipt.animation.model._
+import com.googlecode.lanterna.TerminalFacade
 import jline.console.ConsoleReader
 
-class FakeCanvas(width: Int, height: Int) extends Canvas {
+class FakeScreen(width: Int, height: Int) extends Screen {
   var canvas: Array[Array[Char]] = Array()
   val consoleReader = new ConsoleReader(System.in, System.out)
   clear()
@@ -12,7 +13,7 @@ class FakeCanvas(width: Int, height: Int) extends Canvas {
 
   override def setChar(point: (Int, Int), char: Char): Unit = {
     val (x, y) = point
-    if(x >= 0 && x < width && y >= 0 && y < height) {
+    if (x >= 0 && x < width && y >= 0 && y < height) {
       canvas(y)(x) = char
     }
   }
@@ -26,32 +27,31 @@ class FakeCanvas(width: Int, height: Int) extends Canvas {
   }
 }
 
-object FakeCanvas {
-  def main(args: Array[String]): Unit = {
+object FakeScreen {
+  def main(args: Array[String]) {
     val sequence = ParallelAnimation(Seq(
       TimedWaiting(6500),
       SequentialAnimation(Seq(
-      ParallelAnimation(Seq(
-        TimedWaiting(3000),
-        new AsciiPoint('O', (20, 20)) with MovementByVector {val dx= -20; val dy= -20}
+        ParallelAnimation(Seq(
+          TimedWaiting(3000),
+          MovementByVector(AsciiPoint(20, 20, 'O'), -20, -20)
+        )),
+        TimedWaiting(500),
+        ParallelAnimation(Seq(
+          TimedWaiting(3000),
+          MovementByVector(AsciiPoint(0, 0, 'O'), 20, 20)
+        ))
       )),
-      TimedWaiting(500),
-      ParallelAnimation(Seq(
-        TimedWaiting(3000),
-        new AsciiPoint('O') with MovementByVector {val dx=20; val dy=20; override val baseDuration=MinimalDuration(10)}
-      ))
-    )),
-      new AsciiPoint('M', (5, 10)) with Still,
-      new AsciiPoint('X', (40, 24)) with Still,
-      new AsciiImage(Array(Array('z', 'x'), Array('c', 'b')), (1, 1)) with Still,
-      new AsciiImage(Array(Array('z', 'x'), Array('c', 'b')), (6, 14)) with MovementByVector {val dx=20; val dy=15}
+        AsciiPoint(5, 10, 'M'),
+        AsciiPoint(40, 24, 'X'),
+        AsciiImage(10, 10, Array(Array('z', 'x'), Array('c', 'b'))),
+        MovementByVector(AsciiImage(2, 2, Array(Array('z', 'x'), Array('c', 'b'))), 20, 15)
     ))
     drawAnimation(sequence)
-
   }
 
   def drawAnimation(animation: Animation): Unit = {
-    implicit val canvas = new FakeCanvas(60, 25)
+    implicit val canvas = new FakeScreen(60, 25)
 
     animation.baseDuration match {
       case ExactDuration(totalDuration) => {
