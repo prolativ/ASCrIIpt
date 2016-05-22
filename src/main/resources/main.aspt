@@ -1,9 +1,0 @@
-import "shapes/point";
-
-$point = point "a";
-$placedPoint = place $point at 4 10;
-
-show main = par(
-  wait 2000,
-  show $point at 4 10
-);

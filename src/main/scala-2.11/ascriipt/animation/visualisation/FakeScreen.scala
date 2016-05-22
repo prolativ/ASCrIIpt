@@ -3,7 +3,7 @@ package ascriipt.animation.visualisation
 import ascriipt.animation.model._
 import com.googlecode.lanterna.TerminalFacade
 
-class FakeCanvas(width: Int, height: Int) extends Canvas {
+class FakeScreen(width: Int, height: Int) extends Screen {
   var canvas: Array[Array[Char]] = Array()
   val screen = TerminalFacade.createScreen()
   screen.startScreen()
@@ -35,10 +35,10 @@ class FakeCanvas(width: Int, height: Int) extends Canvas {
   }
 }
 
-object FakeCanvas {
+object FakeScreen {
 
   def drawAnimation(animation: Animation): Unit = {
-    implicit val canvas = new FakeCanvas(60, 25)
+    implicit val canvas = new FakeScreen(60, 25)
 
     try {
       animation.baseDuration match {

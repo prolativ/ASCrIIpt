@@ -10,6 +10,5 @@ point $filling = {
 
 test point = par(
   show (place (point "w") at 4 7),
-  show (place (point "w") at 4 7),
-  wait 1000
+  wait 2000
 );

@@ -1,7 +1,7 @@
 package ascriipt.lang.interpreter
 
 import ascriipt.animation.model.Animation
-import ascriipt.animation.visualisation.FakeCanvas
+import ascriipt.animation.visualisation.FakeScreen
 
 object AscriiptApp extends App {
 
@@ -11,7 +11,7 @@ object AscriiptApp extends App {
       interpreter.eval(expressionStr) match {
         case animation: Animation =>
           println(animation)
-          FakeCanvas.drawAnimation(animation)
+          FakeScreen.drawAnimation(animation)
         case result =>
           println(result)
       }
@@ -21,7 +21,7 @@ object AscriiptApp extends App {
       interpreter.eval(expressionStr) match {
         case animation: Animation =>
           println(animation)
-          FakeCanvas.drawAnimation(animation)
+          FakeScreen.drawAnimation(animation)
         case result =>
           println(result)
       }
