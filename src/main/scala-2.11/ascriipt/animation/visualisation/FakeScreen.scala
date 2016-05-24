@@ -1,7 +1,7 @@
 package ascriipt.animation.visualisation
 
 import ascriipt.animation.model._
-import com.googlecode.lanterna.TerminalFacade
+import ascriipt.libraries.ImageLoader
 import jline.console.ConsoleReader
 
 class FakeScreen(width: Int, height: Int) extends Screen {
@@ -45,7 +45,9 @@ object FakeScreen {
         AsciiPoint(5, 10, 'M'),
         AsciiPoint(40, 24, 'X'),
         AsciiImage(10, 10, Array(Array('z', 'x'), Array('c', 'b'))),
-        MovementByVector(AsciiImage(2, 2, Array(Array('z', 'x'), Array('c', 'b'))), 20, 15)
+        MovementByVector(AsciiImage(2, 2, Array(Array('z', 'x'), Array('c', 'b'))), 20, 15),
+//        MovementByVector(new ImageLoader("assets/example.png").toAsciiImage(4, 4), 20, 10),
+        MovementByVector(new ImageLoader("assets/example_scale.png").toAsciiImageWithScale(4, 4), 20, 10)
     ))
     drawAnimation(sequence)
   }
