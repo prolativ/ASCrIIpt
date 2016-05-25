@@ -1,0 +1,3 @@
+import "./house.aspt";
+
+run main = test house;

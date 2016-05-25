@@ -8,29 +8,28 @@ import ascriipt.lang.parser.AscriiptParser
 
 class NativeDependencyResolver(
                                   parser: => AscriiptParser,
-                                  evaluator: => AscriiptEvaluator,
-                                  basePath: String
+                                  evaluator: => AscriiptEvaluator
                                   ) extends DependencyResolver {
-  private val baseFile = new File(basePath).getCanonicalFile
-  private val parentFile = baseFile.getParentFile
 
-  override def commandsByModuleId(moduleId: String): Seq[Command] = {
-    val pathPieces = moduleId.split("/")
-    val modulePath = parentFile.getPath + File.separator + pathPieces.mkString(File.separator) + ".aspt"
-    commandsFromModuleFile(new File(modulePath))
+  override def commandsByModuleId(moduleId: String, currentFile: File): Seq[Command] = {
+    val baseDirectory = if(currentFile.isFile){
+      currentFile.getParentFile
+    } else {
+      currentFile
+    }
+    val moduleFile = moduleId.split("/").foldLeft(baseDirectory)(new File(_, _)).getCanonicalFile
+    commandsFromModuleFile(moduleFile)
   }
 
   override def implicitlyAvailableCommands: Seq[Command] = Seq.empty
 
-  def baseModuleCommands: Seq[Command] = commandsFromModuleFile(baseFile)
-
-  private def commandsFromModuleFile(file: File): Seq[Command] = {
-    if (file.isFile) {
-      val input = new FileReader(file)
+  def commandsFromModuleFile(moduleFile: File): Seq[Command] = {
+    if(moduleFile.isFile) {
+      val input = new FileReader(moduleFile)
       val parseResult = parser.parseModule(input)
       parseResult match {
         case parser.Success(moduleBody: ModuleBody, in) =>
-          evaluator.evalExternal(moduleBody) match {
+          evaluator.evalInBasicContext(moduleBody, moduleFile) match {
             case ascriiptModule: AscriiptModule =>
               ascriiptModule
                   .definedCommandScope

@@ -1,6 +1,6 @@
-import "rect";
-import "triangle";
-import "point";
+import "shapes/rect.aspt";
+import "shapes/triangle.aspt";
+import "shapes/point.aspt";
 
 house $width $wallHeight $roofHeight = {
 

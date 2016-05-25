@@ -1,5 +1,7 @@
 package ascriipt.lang.interpreter
 
+import java.io.File
+
 trait AscriiptInterpreter {
-  def eval(expressionStr: String): Any
+  def eval(expressionStr: String, currentFile: File): Any
 }
