@@ -14,6 +14,7 @@ object PixelToAsciiMapper {
     case "001010100" => '/'
     case "111101111" => 'O'
     case "111100111" => 'C'
+    case "101010101" => 'X'
     case _ => '\0'
   }
 }

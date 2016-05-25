@@ -14,6 +14,12 @@ object ImageLoaderResolver extends DependencyResolver{
           val imageFile = FileResolver.resolveFile(currentFile.getParentFile.getAbsoluteFile, imagePath)
           val imageLoader = new ImageLoader(imageFile)
         imageLoader.toAsciiImage(leftX, topY)
+      },
+      command("show", "image", "with", "scale", __, "left", __, "top", __){
+        case Seq(imagePath: String, leftX: Int, topY: Int) =>
+          val imageFile = FileResolver.resolveFile(currentFile.getParentFile.getAbsoluteFile, imagePath)
+          val imageLoader = new ImageLoader(imageFile)
+          imageLoader.toAsciiImageWithScale(leftX, topY)
       }
     )
 

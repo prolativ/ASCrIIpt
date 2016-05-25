@@ -3,5 +3,6 @@ import "image";
 
 run main = par(
   wait 3000,
-  show image "../images/example.png" left 10 top 10
+  show image "../images/example.png" left 10 top 10,
+  show image with scale "../images/example_scale.png" left 20 top 20
 );
