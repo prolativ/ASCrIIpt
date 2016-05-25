@@ -17,7 +17,7 @@ class NativeDependencyResolver(
     } else {
       currentFile
     }
-    val moduleFile = moduleId.split("/").foldLeft(baseDirectory)(new File(_, _)).getCanonicalFile
+    val moduleFile = FileResolver.resolveFile(baseDirectory, moduleId)
     commandsFromModuleFile(moduleFile)
   }
 

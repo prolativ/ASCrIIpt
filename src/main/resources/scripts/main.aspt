@@ -1,3 +1,7 @@
 import "./house.aspt";
+import "image";
 
-run main = test house;
+run main = par(
+  wait 3000,
+  show image "../images/example.png" left 10 top 10
+);

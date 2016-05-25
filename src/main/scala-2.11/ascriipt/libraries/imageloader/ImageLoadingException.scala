@@ -1,4 +1,4 @@
-package ascriipt.libraries
+package ascriipt.libraries.imageloader
 
 import ascriipt.common.AscriiptException
 

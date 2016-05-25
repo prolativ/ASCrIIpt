@@ -1,7 +1,6 @@
 package ascriipt.lang.predef
 
 import ascriipt.lang.common.Command
-
 import ascriipt.lang.common.SignatureHelpers._
 
 object MathCommands {

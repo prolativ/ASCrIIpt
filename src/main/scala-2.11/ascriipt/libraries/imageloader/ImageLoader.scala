@@ -1,9 +1,11 @@
-package ascriipt.libraries
+package ascriipt.libraries.imageloader
 
 import ascriipt.animation.model.AsciiImage
 import com.sksamuel.scrimage.Image
 import java.io.File
 import java.nio.file.NoSuchFileException
+
+import ascriipt.animation.model.AsciiImage
 
 object PixelToAsciiMapper {
   def map(value: String): Char =  value match {
@@ -16,14 +18,14 @@ object PixelToAsciiMapper {
   }
 }
 
-class ImageLoader(val path: String) {
-  protected val image: Image = loadImage(path)
+class ImageLoader(val file: File) {
+  protected val image: Image = loadImage(file)
 
-  protected def loadImage(path: String): Image = {
+  protected def loadImage(file: File): Image = {
     try {
-      Image.fromFile(new File(path))
+      Image.fromFile(file)
     } catch {
-      case e: NoSuchFileException => throw new ImageLoadingException("File not found.")
+      case e: NoSuchFileException => throw new ImageLoadingException(s"File $file not found.")
     }
   }
 

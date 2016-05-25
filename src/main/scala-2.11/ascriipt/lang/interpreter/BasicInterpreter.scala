@@ -3,12 +3,13 @@ package ascriipt.lang.interpreter
 import java.io.File
 
 import ascriipt.lang.parser.AscriiptParser
+import ascriipt.libraries.imageloader.ImageLoaderResolver
 
 class BasicInterpreter extends AscriiptInterpreter {
   val parser = new AscriiptParser
   lazy val evaluator: AscriiptEvaluator = new BasicEvaluator(generalDependencyResolver)
   lazy val nativeDependencyResolver: NativeDependencyResolver = new NativeDependencyResolver(parser, evaluator)
-  lazy val dependencySubresolvers = Seq(LangStdDependencyResolver, nativeDependencyResolver)
+  lazy val dependencySubresolvers = Seq(LangStdDependencyResolver, nativeDependencyResolver, ImageLoaderResolver)
   lazy val generalDependencyResolver: GeneralDependencyResolver = {
     new GeneralDependencyResolver(dependencySubresolvers: _*)
   }
