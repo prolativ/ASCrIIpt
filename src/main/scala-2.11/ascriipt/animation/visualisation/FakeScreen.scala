@@ -1,14 +1,15 @@
 package ascriipt.animation.visualisation
 
 import java.io.File
+import java.net.URLClassLoader
 
 import ascriipt.animation.model._
-import ascriipt.libraries.imageloader.ImageLoader
-import jline.console.ConsoleReader
+import com.google.common.reflect.ClassPath
 
-class FakeScreen(width: Int, height: Int) extends Screen {
+import scala.util.Try
+
+class FakeScreen(width: Int, height: Int, renderers: scala.collection.mutable.Set[RenderHook]) extends Screen {
   var canvas: Array[Array[Char]] = Array()
-  val consoleReader = new ConsoleReader(System.in, System.out)
   clear()
 
   override def clear(): Unit = canvas = Array.fill(height, width)(' ')
@@ -20,17 +21,35 @@ class FakeScreen(width: Int, height: Int) extends Screen {
     }
   }
 
-  override def show(): Unit = {
-    consoleReader.clearScreen()
-    for (line <- canvas) {
-      consoleReader.println(line)
-    }
-    consoleReader.flush()
-  }
+  override def show() = renderers.foreach(_.onRender(this))
+  override def getArray = canvas
 }
 
 object FakeScreen {
   def main(args: Array[String]) {
+    val dir = new File("src/main/resources/classes")
+    val files = if(dir.exists && dir.isDirectory) {
+      dir.listFiles.foreach(x => println(x.getName))
+      dir.listFiles.filter(_.isFile).toList
+    }
+    else {
+      List[File]()
+    }
+
+    val cl = new URLClassLoader(files.map(_.toURI.toURL).toArray, this.getClass.getClassLoader)
+//    val klazz = cl.loadClass("Renderer")
+//    val renderHook = klazz.newInstance().asInstanceOf[RenderHook]
+
+    import scala.collection.JavaConverters._
+    val s = ClassPath.from(cl).getTopLevelClasses("ascriipt.animation.visualisation").asScala
+
+    val renderHooks = s.map(_.load())
+      .map(x => Try(x.newInstance()))
+      .filter(_.isSuccess)
+      .map(_.get)
+      .filter(_.isInstanceOf[RenderHook])
+      .map(_.asInstanceOf[RenderHook])
+
     val sequence = ParallelAnimation(Seq(
       TimedWaiting(6500),
       SequentialAnimation(Seq(
@@ -47,15 +66,13 @@ object FakeScreen {
         AsciiPoint(5, 10, 'M'),
         AsciiPoint(40, 24, 'X'),
         AsciiImage(10, 10, Array(Array('z', 'x'), Array('c', 'b'))),
-        MovementByVector(AsciiImage(2, 2, Array(Array('z', 'x'), Array('c', 'b'))), 20, 15),
-//        MovementByVector(new ImageLoader(new File("assets/example.png")).toAsciiImage(4, 4), 20, 10),
-        MovementByVector(new ImageLoader(new File("assets/example_scale.png")).toAsciiImageWithScale(4, 4), 20, 10)
+        MovementByVector(AsciiImage(2, 2, Array(Array('z', 'x'), Array('c', 'b'))), 20, 15)
     ))
-    drawAnimation(sequence)
+    drawAnimation(sequence, renderHooks)
   }
 
-  def drawAnimation(animation: Animation): Unit = {
-    implicit val canvas = new FakeScreen(60, 25)
+  def drawAnimation(animation: Animation, renderers: scala.collection.mutable.Set[RenderHook]): Unit = {
+    implicit val canvas = new FakeScreen(60, 25, renderers)
 
     animation.baseDuration match {
       case ExactDuration(totalDuration) => {
